@@ -22,19 +22,31 @@ function main() {
   PrettyPrint(expression);
 }
 
-function PrettyPrint(node: SyntaxNode, indent = "") {
+function PrettyPrint(
+  node: SyntaxNode,
+  depth = 0,
+  isLast = false,
+) {
+  const marker = isLast ? "└" : "├";
+  const line = "-".repeat(3);
+  const indent = "|   ".repeat(depth);
+
   if (
     node instanceof SyntaxToken && node.Value !== undefined &&
     node.Value !== null
   ) {
-    console.log(indent, node.Kind, node.Value);
+    console.log([indent, marker, line, node.Kind, node.Value].join(""));
   } else {
-    console.log(indent, node.Kind);
+    console.log([indent, marker, line, node.Kind].join(""));
   }
 
-  for (const child of node.Children()) {
-    PrettyPrint(child, indent + "    ");
+  const children = Array.from(node.Children());
+
+  for (let i = 0; i < children.length; ++i) {
+    PrettyPrint(children[i], depth + 1, i + 1 === children.length);
   }
+
+  // ├ │ └ ─
 }
 
 main();
