@@ -1,17 +1,6 @@
-enum SyntaxKind {
-  NumberToken = "Number",
-  WhitespaceToken = "Whitespace",
-  PlusToken = "Plus",
-  MinusToken = "Minus",
-  StarToken = "Star",
-  SlashToken = "Slash",
-  OpenParenthesisToken = "OpenParenthesis",
-  CloseParenthesisToken = "CloseParenthesis",
-  BadToken = "Bad",
-  EndOfFileToken = "EndOfFile",
-}
+import { SyntaxKind, SyntaxNode } from "./types.ts";
 
-class SyntaxToken {
+class SyntaxToken implements SyntaxNode {
   readonly Kind: SyntaxKind;
   readonly Position: number;
   readonly Text: string;
@@ -27,6 +16,10 @@ class SyntaxToken {
     this.Position = position;
     this.Text = text;
     this.Value = value;
+  }
+
+  Children(): Iterable<SyntaxNode> {
+    return [][Symbol.iterator]();
   }
 }
 
@@ -118,4 +111,4 @@ class Lexer {
   }
 }
 
-export { Lexer, SyntaxKind, SyntaxToken };
+export { Lexer, SyntaxToken };
