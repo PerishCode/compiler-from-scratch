@@ -1,13 +1,15 @@
 {
-    "editor.formatOnSave": true,
-    "deno.enable": true,
-    "files.exclude": {
-        "**/.git": true,
-        "**/.svn": true,
-        "**/.hg": true,
-        "**/CVS": true,
-        "**/.DS_Store": true,
-        "**/Thumbs.db": true,
-        ".vscode": true
-    }
+  "editor.formatOnSave": true,
+  "deno.enable": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/Thumbs.db": true,
+    ".vscode": true,
+    "deno.json": true,
+    "import_map.json": true
+  }
 }

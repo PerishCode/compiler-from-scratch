@@ -1,31 +1,10 @@
-import { SyntaxKind, SyntaxNode } from "./types.ts";
-
-class SyntaxToken implements SyntaxNode {
-  readonly Kind: SyntaxKind;
-  readonly Position: number;
-  readonly Text: string;
-  readonly Value?: unknown;
-
-  constructor(
-    kind: SyntaxKind,
-    position: number,
-    text: string,
-    value?: unknown,
-  ) {
-    this.Kind = kind;
-    this.Position = position;
-    this.Text = text;
-    this.Value = value;
-  }
-
-  Children(): Iterable<SyntaxNode> {
-    return [][Symbol.iterator]();
-  }
-}
+import { SyntaxKind } from "./types.ts";
+import { SyntaxToken } from "./token.ts";
 
 class Lexer {
   private readonly text: string;
   private position: number;
+  private diagnostics: string[] = [];
 
   constructor(text: string) {
     this.text = text;
@@ -34,6 +13,10 @@ class Lexer {
 
   private get Current(): string {
     return this.position >= this.text.length ? "\0" : this.text[this.position];
+  }
+
+  get Diagnostics(): Iterable<string> {
+    return this.diagnostics;
   }
 
   private Next() {
@@ -59,6 +42,12 @@ class Lexer {
       const text = this.text.substring(start, this.position);
 
       const value = parseInt(text);
+
+      if (isNaN(value)) {
+        this.diagnostics.push(
+          `The number ${value} cannot be represented by an integer`
+        );
+      }
 
       return new SyntaxToken(SyntaxKind.NumberToken, start, text, value);
     }
@@ -99,16 +88,20 @@ class Lexer {
       return new SyntaxToken(
         SyntaxKind.CloseParenthesisToken,
         this.Next(),
-        ")",
+        ")"
       );
     }
+
+    this.diagnostics.push(
+      `ERRROR: bad charactor input: ${this.Current} at ${this.position}`
+    );
 
     return new SyntaxToken(
       SyntaxKind.BadToken,
       this.Next(),
-      this.text.substring(this.position - 1),
+      this.text.substring(this.position - 1)
     );
   }
 }
 
-export { Lexer, SyntaxToken };
+export { Lexer };

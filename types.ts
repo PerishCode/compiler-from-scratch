@@ -11,6 +11,7 @@ enum SyntaxKind {
   EndOfFileToken = "EndOfFile",
   NumberExpression = "NumberExpression",
   BinaryExpression = "BinaryExpression",
+  ParenthesizedExpression = "ParenthesizedExpression",
 }
 
 interface SyntaxNode {
@@ -18,6 +19,8 @@ interface SyntaxNode {
   Children(): Iterable<SyntaxNode>;
 }
 
+interface ExpressionSyntax extends SyntaxNode {}
+
 export { SyntaxKind };
 
-export type { SyntaxNode };
+export type { SyntaxNode, ExpressionSyntax };
