@@ -1,72 +1,10 @@
+import { BinarySyntax } from "./BinarySyntax.ts";
 import { Lexer } from "./lexer.ts";
-import { SyntaxTree } from "./syntax-tree.ts";
+import { NumberSyntax } from "./NumberSyntax.ts";
+import { ParenthesisSyntax } from "./ParenthesisSyntax.ts";
+import { SyntaxTree } from "./syntaxTree.ts";
 import { SyntaxToken } from "./token.ts";
-import { SyntaxKind, SyntaxNode, ExpressionSyntax } from "./types.ts";
-
-class NumberSyntax implements ExpressionSyntax {
-  readonly Kind: SyntaxKind = SyntaxKind.NumberExpression;
-  readonly NumberToken: SyntaxToken;
-
-  constructor(numberToken: SyntaxToken) {
-    this.NumberToken = numberToken;
-  }
-
-  Children(): Iterable<SyntaxNode> {
-    return [this.NumberToken];
-  }
-}
-
-class BinarySyntax implements ExpressionSyntax {
-  constructor(
-    left: ExpressionSyntax,
-    operatorToken: SyntaxToken,
-    right: ExpressionSyntax
-  ) {
-    this.Left = left;
-    this.OperatorToken = operatorToken;
-    this.Right = right;
-  }
-
-  readonly Left: ExpressionSyntax;
-  readonly OperatorToken: SyntaxToken;
-  readonly Right: ExpressionSyntax;
-
-  get Kind(): SyntaxKind {
-    return SyntaxKind.BinaryExpression;
-  }
-
-  Children(): Iterable<SyntaxNode> {
-    return [this.Left, this.OperatorToken, this.Right];
-  }
-}
-
-class ParenthesisSyntax implements ExpressionSyntax {
-  readonly OpenParenthesisToken: SyntaxToken;
-  readonly Expression: ExpressionSyntax;
-  readonly CloseParenthesisToken: SyntaxToken;
-
-  constructor(
-    openParenthesisToken: SyntaxToken,
-    expression: ExpressionSyntax,
-    closeParenthesisToken: SyntaxToken
-  ) {
-    this.OpenParenthesisToken = openParenthesisToken;
-    this.Expression = expression;
-    this.CloseParenthesisToken = closeParenthesisToken;
-  }
-
-  get Kind(): SyntaxKind {
-    return SyntaxKind.ParenthesizedExpression;
-  }
-
-  Children(): Iterable<SyntaxNode> {
-    return [
-      this.OpenParenthesisToken,
-      this.Expression,
-      this.CloseParenthesisToken,
-    ];
-  }
-}
+import { SyntaxKind, ExpressionSyntax } from "./types.ts";
 
 class Parser {
   private readonly tokens: SyntaxToken[];
@@ -194,4 +132,4 @@ class Parser {
   }
 }
 
-export { Parser, NumberSyntax, BinarySyntax, ParenthesisSyntax };
+export { Parser };

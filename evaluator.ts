@@ -1,4 +1,6 @@
-import { BinarySyntax, NumberSyntax, ParenthesisSyntax } from "./parser.ts";
+import { ParenthesisSyntax } from "./ParenthesisSyntax.ts";
+import { BinarySyntax } from "./BinarySyntax.ts";
+import { NumberSyntax } from "./NumberSyntax.ts";
 import { ExpressionSyntax, SyntaxKind } from "./types.ts";
 
 class Evaluator {
