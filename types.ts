@@ -12,6 +12,8 @@ enum SyntaxKind {
   NumberExpression = "NumberExpression",
   BinaryExpression = "BinaryExpression",
   ParenthesizedExpression = "ParenthesizedExpression",
+  LiteralExpression = "LiteralExpression",
+  UnaryExpression = "UnaryExpression",
 }
 
 interface SyntaxNode {

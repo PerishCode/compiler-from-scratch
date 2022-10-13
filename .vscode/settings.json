@@ -9,6 +9,7 @@
     "**/.DS_Store": true,
     "**/Thumbs.db": true,
     ".vscode": true,
+    ".prettierrc.yml": true,
     "deno.json": true,
     "import_map.json": true
   }

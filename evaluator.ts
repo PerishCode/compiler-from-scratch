@@ -2,6 +2,7 @@ import { ParenthesisSyntax } from "./ParenthesisSyntax.ts";
 import { BinarySyntax } from "./BinarySyntax.ts";
 import { LiteralSyntax } from "./LiteralSyntax.ts";
 import { ExpressionSyntax, SyntaxKind } from "./types.ts";
+import { UnarySyntax } from "./UnarySyntax.ts";
 
 class Evaluator {
   private readonly root: ExpressionSyntax;
@@ -17,6 +18,21 @@ class Evaluator {
   private EvaluateExpression(node: ExpressionSyntax): number {
     if (node instanceof LiteralSyntax) {
       return node.LiteralToken.Value as number;
+    }
+
+    if (node instanceof UnarySyntax) {
+      const operand = this.EvaluateExpression(node.Operand);
+
+      switch (node.OperatorToken.Kind) {
+        case SyntaxKind.PlusToken:
+          return operand;
+        case SyntaxKind.MinusToken:
+          return -operand;
+        default:
+          throw new Error(
+            `Unexpected unary operator ${node.OperatorToken.Kind}`
+          );
+      }
     }
 
     if (node instanceof BinarySyntax) {

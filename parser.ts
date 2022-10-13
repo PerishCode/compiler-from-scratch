@@ -2,9 +2,11 @@ import { BinarySyntax } from "./BinarySyntax.ts";
 import { Lexer } from "./lexer.ts";
 import { LiteralSyntax } from "./LiteralSyntax.ts";
 import { ParenthesisSyntax } from "./ParenthesisSyntax.ts";
+import { GetBinaryOperatorPrecedence, GetUnaryOperatorPrecedence } from "./syntaxRules.ts";
 import { SyntaxTree } from "./syntaxTree.ts";
 import { SyntaxToken } from "./token.ts";
 import { SyntaxKind, ExpressionSyntax } from "./types.ts";
+import { UnarySyntax } from "./UnarySyntax.ts";
 
 class Parser {
   private readonly tokens: SyntaxToken[];
@@ -40,9 +42,7 @@ class Parser {
   private Peek(offset: number) {
     const index = this.position + offset;
 
-    return index >= this.tokens.length
-      ? this.tokens[this.tokens.length - 1]
-      : this.tokens[index];
+    return index >= this.tokens.length ? this.tokens[this.tokens.length - 1] : this.tokens[index];
   }
 
   constructor(text: string) {
@@ -54,10 +54,7 @@ class Parser {
     do {
       token = lexer.NextToken();
 
-      if (
-        token.Kind !== SyntaxKind.WhitespaceToken &&
-        token.Kind !== SyntaxKind.BadToken
-      ) {
+      if (token.Kind !== SyntaxKind.WhitespaceToken && token.Kind !== SyntaxKind.BadToken) {
         tokens.push(token);
       }
     } while (token.Kind != SyntaxKind.EndOfFileToken);
@@ -69,33 +66,40 @@ class Parser {
   private Match(kind: SyntaxKind) {
     if (this.Current.Kind === kind) return this.NextToken;
 
-    this.diagnostics.push(
-      `ERROR: Unexpected token <${this.Current.Kind}>, expected <${kind}>`
-    );
+    this.diagnostics.push(`ERROR: Unexpected token <${this.Current.Kind}>, expected <${kind}>`);
 
     return new SyntaxToken(kind, this.Current.Position);
   }
 
   Parse(): SyntaxTree {
-    const expression = this.ParseTermExpression();
+    const expression = this.ParseExpression();
     const endOfFileToken = this.Match(SyntaxKind.EndOfFileToken);
 
     return new SyntaxTree(this.diagnostics, expression, endOfFileToken);
   }
 
-  private ParseExpression(): ExpressionSyntax {
-    return this.ParseTermExpression();
-  }
+  private ParseExpression(parentPrecedence = 0): ExpressionSyntax {
+    let left: ExpressionSyntax;
 
-  private ParseTermExpression(): ExpressionSyntax {
-    let left = this.ParseFactorExpression();
+    const unaryOperatorPrecedence = GetUnaryOperatorPrecedence(this.Current.Kind);
 
-    while (
-      this.Current.Kind === SyntaxKind.PlusToken ||
-      this.Current.Kind === SyntaxKind.MinusToken
-    ) {
+    if (unaryOperatorPrecedence > 0 && unaryOperatorPrecedence >= parentPrecedence) {
       const operatorToken = this.NextToken;
-      const right = this.ParseFactorExpression();
+      const operand = this.ParseExpression(unaryOperatorPrecedence);
+
+      left = new UnarySyntax(operatorToken, operand);
+    } else {
+      left = this.ParsePrimaryExpression();
+    }
+
+    while (true) {
+      const precedence = GetBinaryOperatorPrecedence(this.Current.Kind);
+
+      if (precedence === 0 || precedence <= parentPrecedence) break;
+
+      const operatorToken = this.NextToken;
+
+      const right = this.ParseExpression(precedence);
 
       left = new BinarySyntax(left, operatorToken, right);
     }
@@ -103,21 +107,9 @@ class Parser {
     return left;
   }
 
-  private ParseFactorExpression(): ExpressionSyntax {
-    let left = this.ParsePrimaryExpression();
-
-    while (
-      this.Current.Kind === SyntaxKind.StarToken ||
-      this.Current.Kind === SyntaxKind.SlashToken
-    ) {
-      const operatorToken = this.NextToken;
-      const right = this.ParsePrimaryExpression();
-
-      left = new BinarySyntax(left, operatorToken, right);
-    }
-
-    return left;
-  }
+  // private ParseExpression(): ExpressionSyntax {
+  //   return this.ParseTermExpression();
+  // }
 
   private ParsePrimaryExpression(): ExpressionSyntax {
     if (this.Current.Kind === SyntaxKind.OpenParenthesisToken) {
