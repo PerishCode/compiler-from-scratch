@@ -1,5 +1,6 @@
 {
   "imports": {
-    "@deno.land/": "https://deno.land/"
+    "@deno.land/": "https://deno.land/",
+    "@syntax/": "./syntax/"
   }
 }
