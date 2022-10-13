@@ -1,6 +1,6 @@
 import { BinarySyntax } from "./BinarySyntax.ts";
 import { Lexer } from "./lexer.ts";
-import { NumberSyntax } from "./NumberSyntax.ts";
+import { LiteralSyntax } from "./LiteralSyntax.ts";
 import { ParenthesisSyntax } from "./ParenthesisSyntax.ts";
 import { SyntaxTree } from "./syntaxTree.ts";
 import { SyntaxToken } from "./token.ts";
@@ -128,7 +128,7 @@ class Parser {
       return new ParenthesisSyntax(left, expression, right);
     }
 
-    return new NumberSyntax(this.Match(SyntaxKind.NumberToken));
+    return new LiteralSyntax(this.Match(SyntaxKind.LiteralToken));
   }
 }
 

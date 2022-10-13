@@ -49,58 +49,53 @@ class Lexer {
         );
       }
 
-      return new SyntaxToken(SyntaxKind.NumberToken, start, text, value);
+      return new SyntaxToken(SyntaxKind.LiteralToken, start, text, value);
     }
 
-    if (this.Current === " ") {
-      const start = this.position;
+    switch (this.Current) {
+      case " ": {
+        const start = this.position;
 
-      while (this.Current === " ") {
-        this.Next();
+        while ((this.Current as string) === " ") {
+          this.Next();
+        }
+
+        const text = this.text.substring(start, this.position);
+
+        return new SyntaxToken(SyntaxKind.WhitespaceToken, start, text);
       }
+      case "+":
+        return new SyntaxToken(SyntaxKind.PlusToken, this.Next(), "+");
+      case "-":
+        return new SyntaxToken(SyntaxKind.MinusToken, this.Next(), "-");
+      case "*":
+        return new SyntaxToken(SyntaxKind.StarToken, this.Next(), "*");
+      case "/":
+        return new SyntaxToken(SyntaxKind.SlashToken, this.Next(), "/");
+      case "(":
+        return new SyntaxToken(
+          SyntaxKind.OpenParenthesisToken,
+          this.Next(),
+          "("
+        );
+      case ")":
+        return new SyntaxToken(
+          SyntaxKind.CloseParenthesisToken,
+          this.Next(),
+          ")"
+        );
+      default: {
+        this.diagnostics.push(
+          `ERRROR: bad charactor input: ${this.Current} at ${this.position}`
+        );
 
-      const text = this.text.substring(start, this.position);
-
-      return new SyntaxToken(SyntaxKind.WhitespaceToken, start, text);
+        return new SyntaxToken(
+          SyntaxKind.BadToken,
+          this.Next(),
+          this.text.substring(this.position - 1)
+        );
+      }
     }
-
-    if (this.Current === "+") {
-      return new SyntaxToken(SyntaxKind.PlusToken, this.Next(), "+");
-    }
-
-    if (this.Current === "-") {
-      return new SyntaxToken(SyntaxKind.MinusToken, this.Next(), "-");
-    }
-
-    if (this.Current === "*") {
-      return new SyntaxToken(SyntaxKind.StarToken, this.Next(), "*");
-    }
-
-    if (this.Current === "/") {
-      return new SyntaxToken(SyntaxKind.SlashToken, this.Next(), "/");
-    }
-
-    if (this.Current === "(") {
-      return new SyntaxToken(SyntaxKind.OpenParenthesisToken, this.Next(), "(");
-    }
-
-    if (this.Current === ")") {
-      return new SyntaxToken(
-        SyntaxKind.CloseParenthesisToken,
-        this.Next(),
-        ")"
-      );
-    }
-
-    this.diagnostics.push(
-      `ERRROR: bad charactor input: ${this.Current} at ${this.position}`
-    );
-
-    return new SyntaxToken(
-      SyntaxKind.BadToken,
-      this.Next(),
-      this.text.substring(this.position - 1)
-    );
   }
 }
 

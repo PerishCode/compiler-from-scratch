@@ -1,6 +1,6 @@
 import { ParenthesisSyntax } from "./ParenthesisSyntax.ts";
 import { BinarySyntax } from "./BinarySyntax.ts";
-import { NumberSyntax } from "./NumberSyntax.ts";
+import { LiteralSyntax } from "./LiteralSyntax.ts";
 import { ExpressionSyntax, SyntaxKind } from "./types.ts";
 
 class Evaluator {
@@ -15,8 +15,8 @@ class Evaluator {
   }
 
   private EvaluateExpression(node: ExpressionSyntax): number {
-    if (node instanceof NumberSyntax) {
-      return node.NumberToken.Value as number;
+    if (node instanceof LiteralSyntax) {
+      return node.LiteralToken.Value as number;
     }
 
     if (node instanceof BinarySyntax) {

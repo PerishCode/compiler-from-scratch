@@ -1,5 +1,5 @@
 enum SyntaxKind {
-  NumberToken = "Number",
+  LiteralToken = "Number",
   WhitespaceToken = "Whitespace",
   PlusToken = "Plus",
   MinusToken = "Minus",
