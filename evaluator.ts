@@ -54,10 +54,6 @@ class Evaluator {
       }
     }
 
-    // if (node instanceof ParenthesisSyntax) {
-    //   return this.EvaluateExpression(node.Expression);
-    // }
-
     throw new Error(`Unexpected Node ${node.Kind}`);
   }
 }

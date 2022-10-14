@@ -1,12 +1,15 @@
-import { SyntaxToken } from "./token.ts";
-import { SyntaxKind, SyntaxNode, ExpressionSyntax } from "./types.ts";
+import { SyntaxToken } from "@syntax/token.ts";
+import { SyntaxKind, SyntaxNode, ExpressionSyntax } from "@syntax/types.ts";
 
 export class LiteralSyntax implements ExpressionSyntax {
   readonly Kind: SyntaxKind = SyntaxKind.LiteralExpression;
   readonly LiteralToken: SyntaxToken;
 
-  constructor(literalToken: SyntaxToken) {
+  readonly Value?: unknown;
+
+  constructor(literalToken: SyntaxToken, value?: unknown) {
     this.LiteralToken = literalToken;
+    this.Value = value;
   }
 
   Children(): Iterable<SyntaxNode> {

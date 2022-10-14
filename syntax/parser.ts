@@ -1,12 +1,12 @@
-import { BinarySyntax } from "./BinarySyntax.ts";
-import { Lexer } from "./lexer.ts";
-import { LiteralSyntax } from "./LiteralSyntax.ts";
-import { ParenthesisSyntax } from "./ParenthesisSyntax.ts";
-import { GetBinaryOperatorPrecedence, GetUnaryOperatorPrecedence } from "./syntaxRules.ts";
-import { SyntaxTree } from "./syntaxTree.ts";
-import { SyntaxToken } from "./token.ts";
-import { SyntaxKind, ExpressionSyntax } from "./types.ts";
-import { UnarySyntax } from "./UnarySyntax.ts";
+import { BinarySyntax } from "@syntax/BinarySyntax.ts";
+import { Lexer } from "@syntax/lexer.ts";
+import { LiteralSyntax } from "@syntax/LiteralSyntax.ts";
+import { ParenthesisSyntax } from "@syntax/ParenthesisSyntax.ts";
+import { GetBinaryOperatorPrecedence, GetUnaryOperatorPrecedence } from "@syntax/syntaxRules.ts";
+import { SyntaxTree } from "@syntax/syntaxTree.ts";
+import { SyntaxToken } from "@syntax/token.ts";
+import { ExpressionSyntax, SyntaxKind } from "@syntax/types.ts";
+import { UnarySyntax } from "@syntax/UnarySyntax.ts";
 
 class Parser {
   private readonly tokens: SyntaxToken[];
@@ -112,15 +112,28 @@ class Parser {
   // }
 
   private ParsePrimaryExpression(): ExpressionSyntax {
-    if (this.Current.Kind === SyntaxKind.OpenParenthesisToken) {
-      const left = this.NextToken;
-      const expression = this.ParseExpression();
-      const right = this.Match(SyntaxKind.CloseParenthesisToken);
+    switch (this.Current.Kind) {
+      case SyntaxKind.OpenParenthesisToken: {
+        const left = this.NextToken;
+        const expression = this.ParseExpression();
+        const right = this.Match(SyntaxKind.CloseParenthesisToken);
 
-      return new ParenthesisSyntax(left, expression, right);
+        return new ParenthesisSyntax(left, expression, right);
+      }
+
+      case SyntaxKind.FalseKeyword:
+      case SyntaxKind.TrueKeyword: {
+        const value = this.Current.Kind === SyntaxKind.TrueKeyword;
+        const keywordToken = this.NextToken;
+
+        return new LiteralSyntax(keywordToken, value);
+      }
+
+      default: {
+        const value = this.Current.Value;
+        return new LiteralSyntax(this.Match(SyntaxKind.LiteralToken), value);
+      }
     }
-
-    return new LiteralSyntax(this.Match(SyntaxKind.LiteralToken));
   }
 }
 

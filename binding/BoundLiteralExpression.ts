@@ -1,7 +1,7 @@
 import { BoundNodeKind, BoundExpression } from "@binding/types.ts";
 
 class BoundLiteralExpression implements BoundExpression {
-  readonly Value: unknown;
+  readonly Value?: unknown;
 
   get Type(): string {
     return typeof this.Value;
@@ -10,7 +10,7 @@ class BoundLiteralExpression implements BoundExpression {
     return BoundNodeKind.LiteralExpression;
   }
 
-  constructor(value: unknown) {
+  constructor(value?: unknown) {
     this.Value = value;
   }
 }

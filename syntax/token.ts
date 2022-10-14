@@ -1,4 +1,4 @@
-import { SyntaxKind, SyntaxNode } from "./types.ts";
+import { SyntaxKind, SyntaxNode } from "@syntax/types.ts";
 
 class SyntaxToken implements SyntaxNode {
   readonly Kind: SyntaxKind;
@@ -6,12 +6,7 @@ class SyntaxToken implements SyntaxNode {
   readonly Text: string | null;
   readonly Value?: unknown;
 
-  constructor(
-    kind: SyntaxKind,
-    position: number,
-    text: string | null = null,
-    value?: unknown
-  ) {
+  constructor(kind: SyntaxKind, position: number, text: string | null = null, value?: unknown) {
     this.Kind = kind;
     this.Position = position;
     this.Text = text;

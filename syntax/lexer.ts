@@ -1,5 +1,6 @@
 import { SyntaxKind } from "./types.ts";
 import { SyntaxToken } from "./token.ts";
+import { GetKeywordKind } from "./syntaxRules.ts";
 
 class Lexer {
   private readonly text: string;
@@ -44,12 +45,21 @@ class Lexer {
       const value = parseInt(text);
 
       if (isNaN(value)) {
-        this.diagnostics.push(
-          `The number ${value} cannot be represented by an integer`
-        );
+        this.diagnostics.push(`The number ${value} cannot be represented by an integer`);
       }
 
       return new SyntaxToken(SyntaxKind.LiteralToken, start, text, value);
+    }
+
+    if (/[a-zA-Z]/.test(this.Current)) {
+      const start = this.position;
+
+      while (/[a-zA-Z]/.test(this.Current)) this.Next();
+
+      const text = this.text.substring(start, this.position);
+      const kind = GetKeywordKind(text);
+
+      return new SyntaxToken(kind, start, text, null);
     }
 
     switch (this.Current) {
@@ -73,27 +83,13 @@ class Lexer {
       case "/":
         return new SyntaxToken(SyntaxKind.SlashToken, this.Next(), "/");
       case "(":
-        return new SyntaxToken(
-          SyntaxKind.OpenParenthesisToken,
-          this.Next(),
-          "("
-        );
+        return new SyntaxToken(SyntaxKind.OpenParenthesisToken, this.Next(), "(");
       case ")":
-        return new SyntaxToken(
-          SyntaxKind.CloseParenthesisToken,
-          this.Next(),
-          ")"
-        );
+        return new SyntaxToken(SyntaxKind.CloseParenthesisToken, this.Next(), ")");
       default: {
-        this.diagnostics.push(
-          `ERRROR: bad charactor input: ${this.Current} at ${this.position}`
-        );
+        this.diagnostics.push(`ERRROR: bad charactor input: ${this.Current} at ${this.position}`);
 
-        return new SyntaxToken(
-          SyntaxKind.BadToken,
-          this.Next(),
-          this.text.substring(this.position - 1)
-        );
+        return new SyntaxToken(SyntaxKind.BadToken, this.Next(), this.text.substring(this.position - 1));
       }
     }
   }

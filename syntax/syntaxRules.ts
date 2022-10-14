@@ -26,4 +26,16 @@ function GetUnaryOperatorPrecedence(kind: SyntaxKind): number {
   }
 }
 
-export { GetBinaryOperatorPrecedence, GetUnaryOperatorPrecedence };
+function GetKeywordKind(text: string): SyntaxKind {
+  switch (text) {
+    case "true":
+      return SyntaxKind.TrueKeyword;
+    case "false":
+      return SyntaxKind.FalseKeyword;
+
+    default:
+      return SyntaxKind.IdentifierToken;
+  }
+}
+
+export { GetBinaryOperatorPrecedence, GetUnaryOperatorPrecedence, GetKeywordKind };

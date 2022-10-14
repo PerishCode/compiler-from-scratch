@@ -26,8 +26,14 @@ class Binder {
 
   BindExpression(syntax: ExpressionSyntax): BoundExpression {
     if (syntax instanceof LiteralSyntax) {
-      const value = syntax.LiteralToken.Value;
-      return new BoundLiteralExpression(typeof value === "number" ? value : 0);
+      switch (typeof syntax.Value) {
+        case "number":
+          return new BoundLiteralExpression(syntax.Value);
+        case "boolean":
+          return new BoundLiteralExpression(syntax.Value);
+        default:
+          return new BoundLiteralExpression();
+      }
     }
 
     if (syntax instanceof UnarySyntax) {
@@ -51,7 +57,7 @@ class Binder {
 
       if (boundOperatorKind === null) {
         this.diagnostics.push(
-          `Binary operator '${syntax.OperatorToken.Text}' is not defind for type ${boundLeft.Kind} and ${boundRight.Kind}`
+          `Binary operator '${syntax.OperatorToken.Text}' is not defind for type ${boundLeft.Type} and ${boundRight.Type}`
         );
         return boundLeft;
       }
@@ -82,7 +88,7 @@ class Binder {
     }
 
     if (rightType !== "number") {
-      throw new Error(`Unexpected binary right oprand type: ${rightType}`);
+      return null;
     }
 
     switch (kind) {
