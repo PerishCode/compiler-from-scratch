@@ -1,6 +1,7 @@
 {
   "imports": {
     "@deno.land/": "https://deno.land/",
-    "@syntax/": "./syntax/"
+    "@syntax/": "./syntax/",
+    "@binding/": "./binding/"
   }
 }

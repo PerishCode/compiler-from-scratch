@@ -1,6 +1,8 @@
-import { readLines } from "@deno.land/std@0.159.0/io/buffer.ts";
 import * as Colors from "@deno.land/std@0.159.0/fmt/colors.ts";
-import { Evaluator, SyntaxTree } from "@syntax/index.ts";
+import { readLines } from "@deno.land/std@0.159.0/io/buffer.ts";
+import { Binder } from "@binding/Binder.ts";
+import { SyntaxTree } from "@syntax/index.ts";
+import { Evaluator } from "./evaluator.ts";
 import { print, println } from "./utils.ts";
 
 async function main() {
@@ -21,15 +23,18 @@ async function main() {
 
       default: {
         const syntaxTree = SyntaxTree.Parse(line);
+        const binder = new Binder();
+        const boundExpression = binder.Bind(syntaxTree.Root);
+        const diagnostics = syntaxTree.Diagnostics.concat(binder.Diagnostics);
 
         if (show) SyntaxTree.PrettyPrint(syntaxTree.Root);
 
-        if (syntaxTree.Diagnostics.length) {
-          for (const diagnostic of syntaxTree.Diagnostics) {
+        if (diagnostics.length) {
+          for (const diagnostic of diagnostics) {
             console.log(Colors.red(diagnostic));
           }
         } else {
-          const evaluator = new Evaluator(syntaxTree.Root);
+          const evaluator = new Evaluator(boundExpression);
           const result = evaluator.Evaluate();
           console.log(result);
         }
