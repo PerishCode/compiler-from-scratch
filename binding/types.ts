@@ -6,6 +6,7 @@ enum BoundNodeKind {
 enum BoundUnaryOperatorKind {
   Identity = "Identity",
   Negation = "Negation",
+  LogicalNegation = "LogicalNegation",
 }
 
 enum BoundBinaryOperatorKind {
@@ -13,6 +14,8 @@ enum BoundBinaryOperatorKind {
   Subtraction = "Subtraction",
   Multiplication = "Multiplication",
   Division = "Division",
+  LogicalAnd = "LogicalAnd",
+  LogicalOr = "LogicalOr",
 }
 
 interface BoundNode {

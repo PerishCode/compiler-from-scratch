@@ -18,9 +18,9 @@ class Evaluator {
     return this.EvaluateExpression(this.root);
   }
 
-  private EvaluateExpression(node: BoundExpression): number {
+  private EvaluateExpression(node: BoundExpression): unknown {
     if (node instanceof BoundLiteralExpression) {
-      return node.Value as number;
+      return node.Value;
     }
 
     if (node instanceof BoundUnaryExpression) {
@@ -28,9 +28,11 @@ class Evaluator {
 
       switch (node.OperatorKind) {
         case BoundUnaryOperatorKind.Identity:
-          return operand;
+          return operand as number;
         case BoundUnaryOperatorKind.Negation:
-          return -operand;
+          return -(operand as number);
+        case BoundUnaryOperatorKind.LogicalNegation:
+          return !(operand as boolean);
         default:
           throw new Error(`Unexpected unary operator ${node.OperatorKind}`);
       }
@@ -42,13 +44,17 @@ class Evaluator {
 
       switch (node.OperatorKind) {
         case BoundBinaryOperatorKind.Addition:
-          return left + right;
+          return (left as number) + (right as number);
         case BoundBinaryOperatorKind.Subtraction:
-          return left - right;
+          return (left as number) - (right as number);
         case BoundBinaryOperatorKind.Multiplication:
-          return left * right;
+          return (left as number) * (right as number);
         case BoundBinaryOperatorKind.Division:
-          return left / right;
+          return (left as number) / (right as number);
+        case BoundBinaryOperatorKind.LogicalAnd:
+          return (left as boolean) && (right as boolean);
+        case BoundBinaryOperatorKind.LogicalOr:
+          return (left as boolean) || (right as boolean);
         default:
           throw new Error(`Unexpected binary operator ${node.OperatorKind}`);
       }

@@ -1,6 +1,6 @@
-import { SyntaxKind } from "./types.ts";
-import { SyntaxToken } from "./token.ts";
-import { GetKeywordKind } from "./syntaxRules.ts";
+import { SyntaxKind } from "@syntax/types.ts";
+import { SyntaxToken } from "@syntax/token.ts";
+import { GetKeywordKind } from "@syntax/syntaxRules.ts";
 
 class Lexer {
   private readonly text: string;
@@ -13,15 +13,26 @@ class Lexer {
   }
 
   private get Current(): string {
-    return this.position >= this.text.length ? "\0" : this.text[this.position];
+    return this.Peek(0);
+  }
+
+  private get LookAhead(): string {
+    return this.Peek(1);
+  }
+
+  private Peek(offset: number) {
+    const index = this.position + offset;
+    return index < this.text.length ? this.text[index] : "\0";
   }
 
   get Diagnostics(): Iterable<string> {
     return this.diagnostics;
   }
 
-  private Next() {
-    return this.position++;
+  private Next(offset = 1) {
+    const current = this.position;
+    this.position += offset;
+    return current;
   }
 
   NextToken(): SyntaxToken {
@@ -86,12 +97,21 @@ class Lexer {
         return new SyntaxToken(SyntaxKind.OpenParenthesisToken, this.Next(), "(");
       case ")":
         return new SyntaxToken(SyntaxKind.CloseParenthesisToken, this.Next(), ")");
-      default: {
-        this.diagnostics.push(`ERRROR: bad charactor input: ${this.Current} at ${this.position}`);
-
-        return new SyntaxToken(SyntaxKind.BadToken, this.Next(), this.text.substring(this.position - 1));
+      case "!":
+        return new SyntaxToken(SyntaxKind.BangToken, this.Next(), "!");
+      case "&": {
+        if (this.LookAhead === "&") return new SyntaxToken(SyntaxKind.AndAndToken, this.Next(2), "&&");
+        break;
+      }
+      case "|": {
+        if (this.LookAhead === "|") return new SyntaxToken(SyntaxKind.PipePipeToken, this.Next(2), "||");
+        break;
       }
     }
+
+    this.diagnostics.push(`ERRROR: bad charactor input: ${this.Current} at ${this.position}`);
+
+    return new SyntaxToken(SyntaxKind.BadToken, this.Next(), this.text.substring(this.position - 1));
   }
 }
 

@@ -107,10 +107,6 @@ class Parser {
     return left;
   }
 
-  // private ParseExpression(): ExpressionSyntax {
-  //   return this.ParseTermExpression();
-  // }
-
   private ParsePrimaryExpression(): ExpressionSyntax {
     switch (this.Current.Kind) {
       case SyntaxKind.OpenParenthesisToken: {

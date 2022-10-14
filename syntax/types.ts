@@ -17,6 +17,9 @@ enum SyntaxKind {
   TrueKeyword = "TrueKeyword",
   FalseKeyword = "FalseKeyword",
   IdentifierToken = "IdentifierToken",
+  BangToken = "BangToken",
+  AndAndToken = "AndAndToken",
+  PipePipeToken = "PipePipeToken",
 }
 
 interface SyntaxNode {

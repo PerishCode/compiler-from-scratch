@@ -1,4 +1,11 @@
-import { ExpressionSyntax, SyntaxKind, BinarySyntax, LiteralSyntax, UnarySyntax } from "@syntax/index.ts";
+import {
+  ExpressionSyntax,
+  SyntaxKind,
+  BinarySyntax,
+  LiteralSyntax,
+  UnarySyntax,
+  ParenthesisSyntax,
+} from "@syntax/index.ts";
 import { BoundExpression, BoundBinaryOperatorKind, BoundUnaryOperatorKind } from "@binding/types.ts";
 import { BoundLiteralExpression } from "@binding/BoundLiteralExpression.ts";
 import { BoundUnaryExpression } from "@binding/BoundUnaryExpression.ts";
@@ -14,11 +21,11 @@ class Binder {
   Bind(syntax: ExpressionSyntax): BoundExpression {
     switch (syntax.Kind) {
       case SyntaxKind.LiteralExpression:
-        return this.BindExpression(syntax);
       case SyntaxKind.UnaryExpression:
-        return this.BindExpression(syntax);
       case SyntaxKind.BinaryExpression:
+      case SyntaxKind.ParenthesizedExpression:
         return this.BindExpression(syntax);
+
       default:
         throw new Error(`Unexpected syntax ${syntax.Kind}`);
     }
@@ -65,44 +72,66 @@ class Binder {
       return new BoundBinaryExpression(boundLeft, boundOperatorKind, boundRight);
     }
 
-    throw new Error(``);
+    if (syntax instanceof ParenthesisSyntax) {
+      return this.BindExpression(syntax.Expression);
+    }
+
+    throw new Error(`Unexpected `);
   }
 
   BindUnaryOperatorKind(kind: SyntaxKind, operandType: string): BoundUnaryOperatorKind | null {
-    if (operandType !== "number") {
-      return null;
-    }
-
-    switch (kind) {
-      case SyntaxKind.PlusToken:
-        return BoundUnaryOperatorKind.Identity;
-      case SyntaxKind.MinusToken:
-        return BoundUnaryOperatorKind.Negation;
+    switch (operandType) {
+      case "number":
+        switch (kind) {
+          case SyntaxKind.PlusToken:
+            return BoundUnaryOperatorKind.Identity;
+          case SyntaxKind.MinusToken:
+            return BoundUnaryOperatorKind.Negation;
+          default:
+            throw new Error(`Unexpected unary operator: ${kind} before type number`);
+        }
+      case "boolean":
+        switch (kind) {
+          case SyntaxKind.BangToken:
+            return BoundUnaryOperatorKind.LogicalNegation;
+          default:
+            throw new Error(`Unexpected unary operator: ${kind} before type boolean`);
+        }
       default:
-        throw new Error(`Unexpected unary operator: ${kind}`);
+        return null;
     }
   }
+
   BindBinaryOperatorKind(kind: SyntaxKind, leftType: string, rightType: string): BoundBinaryOperatorKind | null {
-    if (leftType !== "number") {
-      return null;
+    if (leftType === "number" && rightType === "number") {
+      switch (kind) {
+        case SyntaxKind.PlusToken:
+          return BoundBinaryOperatorKind.Addition;
+        case SyntaxKind.MinusToken:
+          return BoundBinaryOperatorKind.Subtraction;
+        case SyntaxKind.StarToken:
+          return BoundBinaryOperatorKind.Multiplication;
+        case SyntaxKind.SlashToken:
+          return BoundBinaryOperatorKind.Division;
+        default:
+          throw new Error(`Unexpected binary operator: ${kind} for number and number`);
+      }
     }
 
-    if (rightType !== "number") {
-      return null;
+    if (leftType === "boolean" && rightType === "boolean") {
+      switch (kind) {
+        case SyntaxKind.AndAndToken:
+          return BoundBinaryOperatorKind.LogicalAnd;
+
+        case SyntaxKind.PipePipeToken:
+          return BoundBinaryOperatorKind.LogicalOr;
+
+        default:
+          throw new Error(`Unexpected binary operator: ${kind} for boolean and boolean`);
+      }
     }
 
-    switch (kind) {
-      case SyntaxKind.PlusToken:
-        return BoundBinaryOperatorKind.Addition;
-      case SyntaxKind.MinusToken:
-        return BoundBinaryOperatorKind.Subtraction;
-      case SyntaxKind.StarToken:
-        return BoundBinaryOperatorKind.Multiplication;
-      case SyntaxKind.SlashToken:
-        return BoundBinaryOperatorKind.Division;
-      default:
-        throw new Error(`Unexpected binary operator: ${kind}`);
-    }
+    return null;
   }
 }
 
